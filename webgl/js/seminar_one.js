@@ -55,15 +55,6 @@ function click(evento, gl, canvas) {
 
 	x = ((x - rect.left) - canvas.width/2) * 2/canvas.width;
 	y = (canvas.height/2 - (y - rect.top)) * 2/canvas.height;
-         
-    if(clicks.length / 3 > 1) {
-        var lastX = clicks[clicks.length - 3];
-        var lastY = clicks[clicks.length - 2];
-        
-        clicks.push(lastX);
-        clicks.push(lastY);
-        clicks.push(0.0);
-    }
     
     clicks.push(x);
     clicks.push(y);
@@ -74,6 +65,6 @@ function click(evento, gl, canvas) {
 	gl.clear(gl.COLOR_BUFFER_BIT);
     gl.bufferData(gl.ARRAY_BUFFER, puntos, gl.STATIC_DRAW);
     
-    gl.drawArrays(gl.LINES, 0, puntos.length / 3);
+    gl.drawArrays(gl.LINE_STRIP, 0, puntos.length / 3);
     gl.drawArrays(gl.POINTS, 0, puntos.length / 3);
 }
