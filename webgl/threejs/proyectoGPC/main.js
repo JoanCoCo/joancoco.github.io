@@ -1,4 +1,5 @@
 var renderer, scene, camera;
+var cat;
 
 function init() {
     renderer = new THREE.WebGLRenderer();
@@ -10,28 +11,28 @@ function init() {
 
     var aspectRatio = window.innerWidth / window.innerHeight;
     camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
-    camera.position.set(0, 220, 150);
+    camera.position.set(0, 50, 50);
     //camera.position.set(0, 300, 100);
     camera.rotation.x = - Math.PI / 6;
 }
 
 function loadModel() {
-    var pointLight = new THREE.PointLight(0xFFFFFF, 0.9);
-    pointLight.position.set(1, 3, 1);
-    scene.add(pointLight);
+    var light = new THREE.AmbientLight(0xFFFFFF);
+    scene.add(light);
     var loader = new THREE.ObjectLoader();
-    loader.load('webgl/models/cat/cat.json',
+    loader.load('models/gato.json',
                 function(obj) {
-                    var tx = new THREE.ImageUtils.loadTexture('webgl/models/cat/Cat Eye Texture.001.png');
-                    tx.minFilter = tx.magFilter = THREE.LinearFilter;
+                    //var tx = new THREE.ImageUtils.loadTexture('models/soldado/soldado.png');
+                    //tx.minFilter = tx.magFilter = THREE.LinearFilter;
                     obj.traverse(function(child) {
                         if(child instanceof THREE.Mesh) {
-                            child.material.setValues({color: 'white', emissive: 0x444444, map: tx});
+                            //child.material.setValues({map: tx});
                         }
                     });
                     obj.name = 'cat';
                     obj.position.set(0, -1, 0);
-                    scene.add(obj);
+                    cat = obj;
+                    scene.add(cat);
                 });
     scene.add(new THREE.AxesHelper(1));
 }
@@ -46,7 +47,7 @@ function update() {
     var ahora = Date.now();
     angulo += Math.PI / 15 * (ahora - antes) / 1000;
     antes = ahora;
-
+    cat.rotation.y = angulo;
 }
 
 function render() {
