@@ -20,9 +20,9 @@ function loadModel() {
     pointLight.position.set(1, 3, 1);
     scene.add(pointLight);
     var loader = new THREE.ObjectLoader();
-    loader.load('../../models/cat/cat.json',
+    loader.load('webgl/models/cat/cat.json',
                 function(obj) {
-                    var tx = new THREE.ImageUtils.loadTexture('../../models/cat/Cat Eye Texture.001.png');
+                    var tx = new THREE.ImageUtils.loadTexture('webgl/models/cat/Cat Eye Texture.001.png');
                     tx.minFilter = tx.magFilter = THREE.LinearFilter;
                     obj.traverse(function(child) {
                         if(child instanceof THREE.Mesh) {
