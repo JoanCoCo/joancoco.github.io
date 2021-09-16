@@ -159,12 +159,12 @@ function loadRobot() {
 
 function loadScene() {
     var geometry = new THREE.PlaneGeometry(1000, 1000, 10, 10)
-    var material = new THREE.MeshBasicMaterial({color: 0xFFA044, side: THREE.DoubleSide, wireframe: true});
+    var material = new THREE.MeshBasicMaterial({color: 0xFFA044, wireframe: true});
     var plane = new THREE.Mesh(geometry, material);
     plane.position.x = 0
     plane.position.y = 0
     plane.position.z = 0
-    plane.rotation.x = Math.PI / 2
+    plane.rotation.x = - Math.PI / 2
     scene.add(plane);
     loadRobot()
     scene.add(robot);
