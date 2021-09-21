@@ -46,6 +46,7 @@ function loadScene() {
     floor.receiveShadow = true;
     scene.add(floor);
     loadCat();
+    loadAlien();
     scene.add(new THREE.AxesHelper(1));
 }
 
@@ -74,6 +75,7 @@ function update() {
     antes = ahora;
     
     updateCat();
+    updateAlien();
     
     cameraControls.update();
 }

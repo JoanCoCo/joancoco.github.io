@@ -1,4 +1,4 @@
-var cat;
+var cat, catTail, catLeftMustache, catRightMustache, catTail, catLeftEye, catRightEye;
 
 const CAT_STATES = {
     IDLE: "idle",
@@ -41,7 +41,7 @@ function updateCat() {
 
 function catIdleState() {
     if(catShouldRepeatState) {
-        catReachedRotation = animate(ROTATION, cat, Math.PI / 10, catSence * Math.PI / 40, 0, 0);
+        catReachedRotation = animate(ROTATION, catTail, Math.PI / 5, 0, 0, catSence * Math.PI / 8);
         if(catReachedRotation) {
             catReachedRotation = false;
             catSence = -1 * catSence;
@@ -92,6 +92,25 @@ function loadCat() {
                     //var tx = new THREE.ImageUtils.loadTexture('models/soldado/soldado.png');
                     //tx.minFilter = tx.magFilter = THREE.LinearFilter;
                     obj.traverse(function(child) {
+                        switch(child.name) {
+                            case 'tail':
+                                catTail = child;
+                                break;
+                            case 'right_eye':
+                                catRightEye = child;
+                                break;
+                            case 'left_eye':
+                                catLeftEye = child;
+                                break;
+                            case 'right_mustache':
+                                catRightMustache = child;
+                                break;
+                            case 'left_mustache':
+                                catLeftMustache = child;
+                                break;
+                            default:
+                                break;
+                        }
                         if(child instanceof THREE.Mesh) {
                             child.castShadow = true;
                             child.receiveShadow = true;
