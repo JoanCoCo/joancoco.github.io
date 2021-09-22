@@ -122,6 +122,7 @@ function loadCat() {
                     //obj.scale.set(s, s, s);
                     cat = obj;
                     scene.add(cat);
+                    modelsLoaded += 1;
                     loadCannon();
                 });
 }

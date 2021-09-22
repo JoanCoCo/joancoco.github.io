@@ -50,7 +50,7 @@ function loadAlien() {
                     scene.add(alien);
                     alien.position.set(0, 2, 2);
                     alien.rotation.z = alien.rotation.z + Math.PI;
-                    render();
+                    modelsLoaded += 1;
                 });
 }
 
