@@ -14,8 +14,8 @@ function init() {
     mainCamera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
     mainCamera.position.set(0, 220, 150);
     
-    cenitalCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    cenitalCamera.position.set(0, 400, 0);
+    cenitalCamera = new THREE.OrthographicCamera(-150, 150, 150, -150, 0.1, 1000);
+    cenitalCamera.position.set(0, 200, 0);
     cenitalCamera.lookAt(new THREE.Vector3(0, 0, 0));
     
     cameraControls = new THREE.OrbitControls( mainCamera, renderer.domElement );
