@@ -47,8 +47,10 @@ function init() {
 }
 
 function updateAspectRatio() {
+    aspectRatio = window.innerWidth / window.innerHeight;
+    
     renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.aspect = aspectRatio;
     camera.updateProjectionMatrix();
     
     var width = 2;
@@ -58,6 +60,8 @@ function updateAspectRatio() {
     uiCamera.top = height / 2;
     uiCamera.bottom = height / -2
     uiCamera.updateProjectionMatrix();
+    
+    background.scale.set(1, 1 / aspectRatio, 1);
 }
 
 function onMouseMove(event) {
@@ -119,22 +123,27 @@ function loadGame() {
 }
 
 function showLoading() {
-    var geometry = new THREE.PlaneGeometry(2, 2 / aspectRatio, 10);
+    var geometry = new THREE.PlaneGeometry(2, 2, 10);
     var material1 = new THREE.MeshBasicMaterial({color: 0xf48db7, side: THREE.DoubleSide});
     var material2 = new THREE.MeshBasicMaterial({color: 0x983e65, side: THREE.DoubleSide});
     var material3 = new THREE.MeshBasicMaterial({color: 0xcccccc, side: THREE.DoubleSide});
     background = new THREE.Mesh(geometry, material1);
     progressBar = new THREE.Mesh(geometry, material2);
     var backBar = new THREE.Mesh(geometry, material3);
-    background.position.set(2000, 2000, 2001);
-    background.rotation.y = Math.PI;
+    background.position.set(0, 0, -1);
+    background.scale.set(1, 1 / aspectRatio, 1);
     progressBar.position.set(0, 0, 0.1);
     backBar.position.set(0, 0, 0.09);
     backBar.scale.set(0.5, 0.05, 1);
     progressBar.scale.set(0, 0.05, 1);
-    scene.add(background);
     background.add(progressBar);
     background.add(backBar);
+    
+    var loadingPage = new THREE.Object3D();
+    loadingPage.position.set(2000, 2000, 2001);
+    loadingPage.rotation.y = Math.PI;
+    loadingPage.add(background);
+    scene.add(loadingPage);
     
     var loader = new THREE.FontLoader();
     loader.load('fonts/helvetiker_regular.typeface.json', function(font) {
@@ -149,7 +158,7 @@ function showLoading() {
         geometry.center();
         var text = new THREE.Mesh(geometry, material2);
         text.position.set(0, 0.15, 0.1);
-        background.add(text);
+        loadingPage.add(text);
     });
     
     render();
