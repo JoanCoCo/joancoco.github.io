@@ -1,4 +1,6 @@
 var dessert;
+var spawnPoints = [];
+var totalNumberOfSpawnPoints = 0;
 
 function loadDessert() {
     var loader = new THREE.ObjectLoader();
@@ -8,6 +10,15 @@ function loadDessert() {
                         if(child instanceof THREE.Mesh) {
                             child.castShadow = true;
                             child.receiveShadow = true;
+                        }
+                        
+                        switch(child.name) {
+                            case "spawn_point":
+                                spawnPoints.push(child);
+                                totalNumberOfSpawnPoints += 1;
+                                break;
+                            default:
+                                break;
                         }
                     });
                     obj.name = 'dessert';

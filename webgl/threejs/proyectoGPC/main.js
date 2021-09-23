@@ -7,7 +7,7 @@ const MODELS_SCALE = 50.0;
 
 var elapsedTime = 0;
 
-const NUMBER_OF_MODELS_TO_LOAD = 4;
+const NUMBER_OF_MODELS_TO_LOAD = 26;
 var modelsLoaded = 0;
 
 var splash = true;
@@ -44,6 +44,7 @@ function init() {
     window.addEventListener('mousemove', onMouseMove, false);
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('click', onClick);
 }
 
 function updateAspectRatio() {
@@ -69,6 +70,12 @@ function onMouseMove(event) {
     mouse.y = 1 - (event.clientY / window.innerHeight) * 2;
 }
 
+function onClick() {
+    if(!splash) {
+        shootBullet();
+    }
+}
+
 function onKeyDown(event) {
     switch (event.keyCode) {
         case 90:
@@ -76,6 +83,9 @@ function onKeyDown(event) {
             break;
         case 88:
             pullDirection = -1;
+            break;
+        case 32:
+            spawnAlien();
             break;
     }
 }
@@ -108,6 +118,7 @@ function loadScene() {
     floor.receiveShadow = true;
     scene.add(floor);
     loadCat();
+    loadBullets();
     loadAlien();
     loadDessert();
     scene.add(new THREE.AxesHelper(1));
@@ -136,8 +147,13 @@ function showLoading() {
     backBar.position.set(0, 0, 0.09);
     backBar.scale.set(0.5, 0.05, 1);
     progressBar.scale.set(0, 0.05, 1);
-    background.add(progressBar);
+    //background.add(progressBar);
     background.add(backBar);
+    
+    var progressBarRoot = new THREE.Object3D();
+    progressBarRoot.position.set(-0.5, 0, 0.1);
+    background.add(progressBarRoot);
+    progressBarRoot.add(progressBar);
     
     var loadingPage = new THREE.Object3D();
     loadingPage.position.set(2000, 2000, 2001);
@@ -176,12 +192,12 @@ function update() {
         updateAlien();
         updateCannonRotation();
         updateCannonPosition();
+        updateBullets();
     } else {
         updateProgressBar();
         if(modelsLoaded >= NUMBER_OF_MODELS_TO_LOAD) {
-            splash = false;
-            background.clear();
-            background.removeFromParent();
+            //splash = false;
+            //background.clear();
         } else {
             console.log("Models loaded: " + modelsLoaded.toString());
         }
@@ -191,6 +207,7 @@ function update() {
 
 function updateProgressBar() {
     progressBar.scale.set((0.5 / NUMBER_OF_MODELS_TO_LOAD) * modelsLoaded, 0.05, 1);
+    progressBar.position.set((0.5 / NUMBER_OF_MODELS_TO_LOAD) * modelsLoaded, 0, 0.1);
 }
 
 function render() {
