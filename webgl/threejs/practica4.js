@@ -1,7 +1,9 @@
 var renderer, scene, mainCamera, cenitalCamera;
-var robot, base, brazo, antebrazo, mano;
+var robot, base, brazo, antebrazo, mano, dedoDerecho, dedoIzquierdo;
 var robotController;
 var stats;
+var keyboard;
+var plane;
 
 function init() {
     renderer = new THREE.WebGLRenderer();
@@ -22,9 +24,18 @@ function init() {
     
     cameraControls = new THREE.OrbitControls( mainCamera, renderer.domElement );
     cameraControls.target.set( 0, 120, 0 );
+    cameraControls.keys = {
+        LEFT: '',
+        UP: '',
+        RIGHT: '',
+        BOTTOM: ''
+    }
+    
+    keyboard = new THREEx.KeyboardState(renderer.domElement);
+    renderer.domElement.setAttribute("tabIndex", "0");
+    renderer.domElement.focus();
     
     window.addEventListener('resize', updateAspectRatio);
-    window.addEventListener('keydown', onKeyDown);
 }
 
 function updateAspectRatio()
@@ -37,16 +48,16 @@ function updateAspectRatio()
 function onKeyDown(event) {
     switch (event.keyCode) {
         case 37: //Left
-            robot.position.x = robot.position.x + 1.0;
+            robot.position.x = robot.position.x - 10.0;
             break;
         case 38: //Up
-            robot.position.z = robot.position.z + 1.0;
+            robot.position.z = robot.position.z - 10.0;
             break;
         case 39: //Right
-            robot.position.x = robot.position.x - 1.0;
+            robot.position.x = robot.position.x + 10.0;
             break;
         case 40: //Down
-            robot.position.z = robot.position.z - 1.0;
+            robot.position.z = robot.position.z + 10.0;
             break;
     }
 }
@@ -171,12 +182,12 @@ function loadPinza() {
     }
 
     var material = new THREE.MeshBasicMaterial({color: 0x00FFFF, wireframe: true});
-    var dedoDerecho = new THREE.Mesh(malla, material);
-    var dedoIzquierdo = new THREE.Mesh(malla, material);
+    dedoDerecho = new THREE.Mesh(malla, material);
+    dedoIzquierdo = new THREE.Mesh(malla, material);
     mano.add(dedoDerecho);
     mano.add(dedoIzquierdo);
-    dedoDerecho.position.z = 18;
-    dedoIzquierdo.position.z = -18;
+    dedoDerecho.position.z = 17;
+    dedoIzquierdo.position.z = -17;
     dedoIzquierdo.rotation.x = - Math.PI;
 }
 
@@ -186,7 +197,7 @@ function loadRobot() {
     robot.add(base);
     loadBrazo()
     base.add(brazo);
-    robot.rotation.y = - Math.PI / 4
+    //robot.rotation.y = - Math.PI / 4
     loadAntebrazo();
     antebrazo.position.y = 120;
     brazo.add(antebrazo);
@@ -195,7 +206,7 @@ function loadRobot() {
 function loadScene() {
     var geometry = new THREE.PlaneGeometry(1000, 1000, 10, 10)
     var material = new THREE.MeshBasicMaterial({color: 0xFFA044, wireframe: true});
-    var plane = new THREE.Mesh(geometry, material);
+    plane = new THREE.Mesh(geometry, material);
     plane.position.x = 0
     plane.position.y = 0
     plane.position.z = 0
@@ -212,16 +223,50 @@ function setUpGUI() {
         giroAntebrazoY: antebrazo.rotation.y,
         giroAntebrazoZ: antebrazo.rotation.z,
         giroPinza: mano.rotation.z,
-        aperturaPinza: 15.0
+        aperturaPinza: 15.0,
+        colorRobot: "rgb(0, 255, 255)",
+        colorSuelo: "rgb(255, 160, 68)",
+        colorFondo: "rgb(0, 0, 0)"
     };
     var gui = new dat.GUI();
     var h = gui.addFolder("Control Robot");
-    h.add(robotController, "giroBase", -180.0, 180.0, 0.025).name("Giro Base");
-    h.add(robotController, "giroBrazo", -45.0, 45.0, 0.025).name("Giro Brazo");
-    h.add(robotController, "giroAntebrazoY", -180.0, 180.0, 0.025).name("Giro Antebrazo Y");
-    h.add(robotController, "giroAntebrazoZ", -90.0, 90.0, 0.025).name("Giro Antebrazo Z");
-    h.add(robotController, "giroPinza", -40.0, 220.0, 0.025).name("Giro Pinza");
-    h.add(robotController, "aperturaPinza", 0.0, 15.0, 0.025).name("Separacion Pinza");
+    h.add(robotController, "giroBase", -180.0, 180.0, 0.025).name("Giro Base").onChange(function(value) {
+        base.rotation.y = (Math.PI / 180.0) * value;
+    });
+    h.add(robotController, "giroBrazo", -45.0, 45.0, 0.025).name("Giro Brazo").onChange(function(value) {
+        brazo.rotation.z = (Math.PI / 180.0) * value;
+    });
+    h.add(robotController, "giroAntebrazoY", -180.0, 180.0, 0.025).name("Giro Antebrazo Y").onChange(function(value) {
+        antebrazo.rotation.y = (Math.PI / 180.0) * value;
+    });
+    h.add(robotController, "giroAntebrazoZ", -90.0, 90.0, 0.025).name("Giro Antebrazo Z").onChange(function(value) {
+        antebrazo.rotation.z = (Math.PI / 180.0) * value;
+    });
+;
+    h.add(robotController, "giroPinza", -40.0, 220.0, 0.025).name("Giro Pinza").onChange(function(value) {
+        mano.rotation.z = (Math.PI / 180.0) * value;
+    });
+;
+    h.add(robotController, "aperturaPinza", 0.0, 15.0, 0.025).name("Separacion Pinza").onChange(function(value) {
+        dedoDerecho.position.z = value + 2;
+        dedoIzquierdo.position.z = -value - 2;
+    });
+    
+    h.addColor(robotController, "colorRobot").name("Color Robot").onChange(function(color) {
+        robot.traverse(function(hijo) {
+            if(hijo instanceof THREE.Mesh) {
+                hijo.material.color = new THREE.Color(color);
+            }
+        });
+    });
+    
+    h.addColor(robotController, "colorSuelo").name("Color Suelo").onChange(function(color) {
+        plane.material.color = new THREE.Color(color);
+    });
+    
+    h.addColor(robotController, "colorFondo").name("Color Fondo").onChange(function(color) {
+        renderer.setClearColor(new THREE.Color(color), 1.0);
+    });
     
     stats = new Stats();
     stats.showPanel(0);
@@ -231,7 +276,20 @@ function setUpGUI() {
 var antes = Date.now();
 function update() {
     var ahora = Date.now();
+    var elapsedTime = (ahora - antes) / 1000;
     antes = ahora;
+    
+    if(keyboard.pressed('left')) {
+        robot.position.x = robot.position.x - 50.0 * elapsedTime;
+    } else if(keyboard.pressed('right')) {
+        robot.position.x = robot.position.x + 50.0 * elapsedTime;
+    }
+    
+    if(keyboard.pressed('up')) {
+        robot.position.z = robot.position.z - 50.0 * elapsedTime;
+    } else if(keyboard.pressed('down')) {
+        robot.position.z = robot.position.z + 50.0 * elapsedTime;
+    }
     
     cameraControls.update();
 }
