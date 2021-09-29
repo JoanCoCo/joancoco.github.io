@@ -45,23 +45,6 @@ function updateAspectRatio()
   mainCamera.updateProjectionMatrix();
 }
 
-function onKeyDown(event) {
-    switch (event.keyCode) {
-        case 37: //Left
-            robot.position.x = robot.position.x - 10.0;
-            break;
-        case 38: //Up
-            robot.position.z = robot.position.z - 10.0;
-            break;
-        case 39: //Right
-            robot.position.x = robot.position.x + 10.0;
-            break;
-        case 40: //Down
-            robot.position.z = robot.position.z + 10.0;
-            break;
-    }
-}
-
 function loadBase() {
     var geometry = new THREE.CylinderGeometry(50, 50, 15, 20);
     var material = new THREE.MeshBasicMaterial({color:0x00FFFF, wireframe: true});
