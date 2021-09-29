@@ -14,6 +14,9 @@ var splash = true;
 
 var background, progressBar;
 
+var keyboard;
+var stats;
+
 function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -40,11 +43,39 @@ function init() {
     
     scene.fog = new THREE.Fog(0xEFD1D5, 100, 1000);
     
+    keyboard = new THREEx.KeyboardState(renderer.domElement);
+    renderer.domElement.setAttribute("tabIndex", "0");
+    renderer.domElement.focus();
+    
+    keyboard.domElement.addEventListener('keydown', function(event) {
+        if(keyboard.eventMatches(event, 'z')) {
+            pullDirection = 1;
+        } else if(keyboard.eventMatches(event, 'x')) {
+            pullDirection = -1;
+        }
+        
+        if(keyboard.eventMatches(event, 'space')) {
+            spawnAlien();
+        }
+    })
+    
+    keyboard.domElement.addEventListener('keyup', function(event) {
+        if(keyboard.eventMatches(event, 'z')) {
+            pullDirection = 0;
+        } else if(keyboard.eventMatches(event, 'x')) {
+            pullDirection = 0;
+        }
+    })
+    
     window.addEventListener('resize', updateAspectRatio);
     window.addEventListener('mousemove', onMouseMove, false);
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
     window.addEventListener('click', onClick);
+    
+    stats = new Stats();
+    stats.showPanel(0);
+    document.getElementById('container').appendChild(stats.domElement);
+    
+    initPhysics();
 }
 
 function updateAspectRatio() {
@@ -73,31 +104,6 @@ function onMouseMove(event) {
 function onClick() {
     if(!splash) {
         shootBullet();
-    }
-}
-
-function onKeyDown(event) {
-    switch (event.keyCode) {
-        case 90:
-            pullDirection = 1;
-            break;
-        case 88:
-            pullDirection = -1;
-            break;
-        case 32:
-            spawnAlien();
-            break;
-    }
-}
-
-function onKeyUp(event) {
-    switch (event.keyCode) {
-        case 90:
-            pullDirection = 0;
-            break;
-        case 88:
-            pullDirection = 0;
-            break;
     }
 }
 
@@ -194,6 +200,7 @@ function update() {
         updateCannonPosition();
         updateBullets();
         TWEEN.update(ahora);
+        updatePhysics();
     } else {
         updateProgressBar();
         if(modelsLoaded >= NUMBER_OF_MODELS_TO_LOAD) {
@@ -213,6 +220,9 @@ function updateProgressBar() {
 
 function render() {
     requestAnimationFrame(render);
+    
+    stats.begin();
+    
     update();
     
     if(!splash) {
@@ -231,6 +241,8 @@ function render() {
         renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
         renderer.render(scene, uiCamera);
     }
+    
+    stats.end();
 }
 
 init();
