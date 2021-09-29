@@ -1,5 +1,7 @@
-var renderer, scene, camera;
-var robot, base, brazo, antebrazo, mano
+var renderer, scene, mainCamera, cenitalCamera;
+var robot, base, brazo, antebrazo, mano;
+var robotController;
+var stats;
 
 function init() {
     renderer = new THREE.WebGLRenderer();
@@ -10,10 +12,43 @@ function init() {
     scene = new THREE.Scene();
 
     var aspectRatio = window.innerWidth / window.innerHeight;
-    camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
-    camera.position.set(0, 220, 150);
-    //camera.position.set(0, 300, 100);
-    camera.rotation.x = - Math.PI / 6;
+    
+    mainCamera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
+    mainCamera.position.set(0, 220, 150);
+    
+    cenitalCamera = new THREE.OrthographicCamera(-150, 150, 150, -150, 0.1, 1000);
+    cenitalCamera.position.set(0, 200, 0);
+    cenitalCamera.lookAt(new THREE.Vector3(0, 0, 0));
+    
+    cameraControls = new THREE.OrbitControls( mainCamera, renderer.domElement );
+    cameraControls.target.set( 0, 120, 0 );
+    
+    window.addEventListener('resize', updateAspectRatio);
+    window.addEventListener('keydown', onKeyDown);
+}
+
+function updateAspectRatio()
+{
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  mainCamera.aspect = window.innerWidth / window.innerHeight;
+  mainCamera.updateProjectionMatrix();
+}
+
+function onKeyDown(event) {
+    switch (event.keyCode) {
+        case 37: //Left
+            robot.position.x = robot.position.x + 1.0;
+            break;
+        case 38: //Up
+            robot.position.z = robot.position.z + 1.0;
+            break;
+        case 39: //Right
+            robot.position.x = robot.position.x - 1.0;
+            break;
+        case 40: //Down
+            robot.position.z = robot.position.z - 1.0;
+            break;
+    }
 }
 
 function loadBase() {
@@ -170,21 +205,59 @@ function loadScene() {
     scene.add(robot);
 }
 
+function setUpGUI() {
+    robotController = {
+        giroBase: base.rotation.y,
+        giroBrazo: brazo.rotation.z,
+        giroAntebrazoY: antebrazo.rotation.y,
+        giroAntebrazoZ: antebrazo.rotation.z,
+        giroPinza: mano.rotation.z,
+        aperturaPinza: 15.0
+    };
+    var gui = new dat.GUI();
+    var h = gui.addFolder("Control Robot");
+    h.add(robotController, "giroBase", -180.0, 180.0, 0.025).name("Giro Base");
+    h.add(robotController, "giroBrazo", -45.0, 45.0, 0.025).name("Giro Brazo");
+    h.add(robotController, "giroAntebrazoY", -180.0, 180.0, 0.025).name("Giro Antebrazo Y");
+    h.add(robotController, "giroAntebrazoZ", -90.0, 90.0, 0.025).name("Giro Antebrazo Z");
+    h.add(robotController, "giroPinza", -40.0, 220.0, 0.025).name("Giro Pinza");
+    h.add(robotController, "aperturaPinza", 0.0, 15.0, 0.025).name("Separacion Pinza");
+    
+    stats = new Stats();
+    stats.showPanel(0);
+    document.getElementById('container').appendChild(stats.domElement);
+}
+
 var antes = Date.now();
-var angulo = 0;
 function update() {
     var ahora = Date.now();
-    angulo += Math.PI / 15 * (ahora - antes) / 1000;
     antes = ahora;
-    robot.rotation.y = angulo;
+    
+    cameraControls.update();
 }
 
 function render() {
     requestAnimationFrame(render);
+    
+    stats.begin();
+    
     update();
-    renderer.render(scene, camera);
+    
+    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+    renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
+    renderer.setScissorTest(true);
+    renderer.render(scene, mainCamera);
+    
+    var size = (window.innerHeight > window.innerWidth) ? window.innerWidth / 4 : window.innerHeight / 4;
+    renderer.setViewport(0, window.innerHeight - size, size, size);
+    renderer.setScissor(0, window.innerHeight - size, size, size);
+    renderer.setScissorTest(true);
+    renderer.render(scene, cenitalCamera);
+    
+    stats.end();
 }
 
 init();
 loadScene();
+setUpGUI();
 render();
