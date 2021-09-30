@@ -11,7 +11,6 @@ function initPhysics() {
 function updatePhysics() {
     phyWorld.step(elapsedTime);
     updateBulletsPhysics();
-    updateAlienPhysics();
     updateCannonPhysics();
 }
 

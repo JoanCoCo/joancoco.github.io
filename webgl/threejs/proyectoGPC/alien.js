@@ -119,17 +119,6 @@ function updateAlienRotation() {
     }
 }
 
-function updateAlienPhysics() {
-    var s = 1 / MODELS_SCALE;
-    for(var i = 0; i < ALIENS_POOL_SIZE; i++) {
-        if(aliensBussy[i] >= 0) {
-            aliens[i].position.set(phyAliens[i].position.x - ALIEN_BOUNDING_BOX_DISPLACEMENT.x * s, phyAliens[i].position.y - ALIEN_BOUNDING_BOX_DISPLACEMENT.y * s, phyAliens[i].position.z - ALIEN_BOUNDING_BOX_DISPLACEMENT.z * s);
-            aliens[i].quaternion.copy(phyAliens[i].quaternion);
-            //console.log(phyAliens[i].position);
-        }
-    }
-}
-
 function spawnAlien() {
     var s = 1 / MODELS_SCALE;
     for(var i = 0; i < ALIENS_POOL_SIZE; i++) {
