@@ -56,8 +56,6 @@ function loadCannon() {
                     phyCannon.position.copy(cannon.position);
                     phyCannon.quaternion.copy(cannon.quaternion);
         
-                    phyCannon.angularDamping = 0;
-        
                     phyWorld.add(phyCannon);
                     
                     modelsLoaded += 1;
@@ -87,5 +85,6 @@ function updateCannonPhysics() {
     cannon.position.copy(phyCannon.position);
     if(cannon.position.y < -2 && !gameOver) {
         gameOver = true;
+        document.getElementById('container').removeChild(scoreDisplay.domElement);
     }
 }

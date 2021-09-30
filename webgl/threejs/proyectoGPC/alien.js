@@ -15,6 +15,8 @@ var alienRightWingsUpRotation = [];
 var alienLeftWingsDownRotation = [];
 var alienLeftWingsUpRotation = [];
 
+var aliensPosition = [];
+
 var alienTailsRotation = [];
 
 const WINGS_SPEED = 500;
@@ -23,6 +25,8 @@ const ALIEN_BOUNDING_BOX_SIZE = {x: 58.682, y: 41.773, z: 27.124};
 const ALIEN_BOUNDING_BOX_DISPLACEMENT = {x: 0.0, y: 11.773, z: 0.0}
 
 var phyAliens = [];
+
+var aliensAnimation = [ ];
 
 function loadAlien() {
     var loader = new THREE.ObjectLoader();
@@ -40,6 +44,9 @@ function loadAlien() {
                     obj.receiveShadow = true;
                     obj.castShadow = true;
                     
+                    aliensPosition.push({v: 0})
+                    aliensAnimation.push(0);
+        
                     for(var i = 0; i < ALIENS_POOL_SIZE; i++) {
                         aliens.push(obj.clone(true));
                         aliensBussy.push(-1);
@@ -121,6 +128,18 @@ function spawnAlien() {
             aliensBussy[i] = point;
             scene.add(aliens[i]);
             
+            /*aliensPosition[i].v = aliens[i].y;
+            
+            var tweenMove1 = new TWEEN.Tween(aliensPosition[i]).to({v: aliens[i].y + 10}, 2000).easing(TWEEN.Easing.Sinusoidal.InOut).onUpdate(onUpdateAlienPosition);
+            var tweenMove2 = new TWEEN.Tween(aliensPosition[i]).to({v: aliens[i].y - 10}, 2000).easing(TWEEN.Easing.Sinusoidal.InOut).onUpdate(onUpdateAlienPosition);
+            
+            tweenMove1.chain(tweenMove2);
+            tweenMove2.chain(tweenMove1);
+            
+            tweenMove1.start();
+            
+            aliensAnimation[i] = tweenMove1;*/
+            
             phyAliens[i].position.copy(new CANNON.Vec3(aliens[i].position.x + ALIEN_BOUNDING_BOX_DISPLACEMENT.x * s, aliens[i].position.y + ALIEN_BOUNDING_BOX_DISPLACEMENT.y * s, aliens[i].position.z + ALIEN_BOUNDING_BOX_DISPLACEMENT.z * s));
             phyAliens[i].quaternion.copy(aliens[i].quaternion);
             phyWorld.add(phyAliens[i]);
@@ -130,6 +149,11 @@ function spawnAlien() {
     }
 }
 
+/*function onUpdateAlienPosition() {
+    for(var i = 0; i < ALIENS_POOL_SIZE; i++) {
+        aliens[i].position.y = aliensPosition[i].v;
+    }
+}*/
 
 function setUpAlienAnimation() {
     for(var i = 0; i < ALIENS_POOL_SIZE; i++) {
@@ -202,7 +226,8 @@ function alienWasHit(i) {
         phyWorld.remove(phyAliens[i]);
         resetPhsyicBody(phyAliens[i]);
         aliensBussy[i] = -1;
-        score = score + 1;
+        aliensAnimation[i].stop();
+        updateScore();
         spawnAlien();
     }
 }

@@ -18,7 +18,7 @@ var stats;
 
 var pullDirection = 0;
 
-var score = 0;
+var scoreDisplay;
 var gameOver = false;
 
 function init() {
@@ -199,12 +199,16 @@ function update() {
         updateBullets();
         TWEEN.update(ahora);
         updatePhysics();
+        //ThreeMeshUI.update();
     } else if(!gameOver) {
         updateProgressBar();
         if(modelsLoaded >= NUMBER_OF_MODELS_TO_LOAD) {
             splash = false;
             background.clear();
             loadingPage.remove(text);
+            
+            scoreDisplay = new Score();
+            document.getElementById('container').appendChild(scoreDisplay.domElement);
             
             var material2 = new THREE.MeshBasicMaterial({color: 0x983e65, side: THREE.DoubleSide});
             var loader = new THREE.FontLoader();
@@ -223,6 +227,7 @@ function update() {
                 loadingPage.add(text);
             });
             
+            updateScoreDisplay();
             spawnAlien();
         } else {
             console.log("Models loaded: " + modelsLoaded.toString());
@@ -263,6 +268,10 @@ function render() {
     }
     
     stats.end();
+}
+
+function updateScoreDisplay() {
+    scoreDisplay.update(score);
 }
 
 init();
