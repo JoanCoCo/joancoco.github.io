@@ -26,7 +26,7 @@ function loadDessert() {
                             
                             var mass = 0;
                             var shape = new CANNON.Box(new CANNON.Vec3((boxSize.x / 2) * s, (boxSize.y / 2) * s, (boxSize.z / 2) * s));
-                            var phyBody = new CANNON.Body({mass, shape});
+                            var phyBody = new CANNON.Body({mass: mass, shape: shape});
                             
                             var spawnPosition = new THREE.Vector3();
                             var spawnRotation = new THREE.Quaternion();

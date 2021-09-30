@@ -1,5 +1,9 @@
 var cannon, shooter, leftWeel, rightWeel, seat;
-const CANNON_SPEED = 5.0;
+const CANNON_SPEED = 1.0;
+
+var phyCannon;
+
+const CANNON_BOUNDING_BOX = {x: 42.349, y: 4.717, z: 34.640};
 
 function loadCannon() {
     var loader = new THREE.ObjectLoader();
@@ -32,7 +36,7 @@ function loadCannon() {
                         }
                     });
                     obj.name = 'cannon';
-                    obj.position.set(0, 0.55, 0);
+                    obj.position.set(0, 1, 0);
                     var s = 1 / MODELS_SCALE;
                     obj.scale.set(s, s, s);
                     obj.receiveShadow = true;
@@ -43,6 +47,19 @@ function loadCannon() {
                     camera.position.set(0, 120, -100);
                     camera.rotation.x = Math.PI / 6;
                     camera.rotation.y = Math.PI;
+                    
+                    //var shape = new CANNON.Box(new CANNON.Vec3(CANNON_BOUNDING_BOX.x * s / 2, CANNON_BOUNDING_BOX.y * s / 2, CANNON_BOUNDING_BOX.z * s / 2));
+                    var shape = new CANNON.Sphere(CANNON_BOUNDING_BOX.y * s / 2);
+                    var mass = 3;
+                    phyCannon = new CANNON.Body({mass: mass, shape: shape, linearDamping: 0.9, angularDamping: 0.9});
+        
+                    phyCannon.position.copy(cannon.position);
+                    phyCannon.quaternion.copy(cannon.quaternion);
+        
+                    phyCannon.angularDamping = 0;
+        
+                    phyWorld.add(phyCannon);
+                    
                     modelsLoaded += 1;
                 });
 }
@@ -53,14 +70,22 @@ function updateCannonRotation() {
     if(Math.abs(mouse.x) > 0.2) {
         var yr = cannon.rotation.y - mouse.x * Math.PI / 2 * elapsedTime;
         cannon.rotation.y = yr;
+        //phyCannon.quaternion.copy(cannon.quaternion);
     }
 }
 
 function updateCannonPosition() {
-    var mag = CANNON_SPEED * pullDirection * elapsedTime;
-    var z = Math.cos(cannon.rotation.y) * mag;
-    var x = Math.sin(cannon.rotation.y) * mag;
-    cannon.position.x += x;
-    cannon.position.z += z;
-    
+    if(pullDirection != 0) {
+        var mag = CANNON_SPEED * pullDirection;
+        var z = Math.cos(cannon.rotation.y) * mag;
+        var x = Math.sin(cannon.rotation.y) * mag;
+        phyCannon.applyImpulse(new CANNON.Vec3(x, 0, z), phyCannon.position);
+    }
+}
+
+function updateCannonPhysics() {
+    cannon.position.copy(phyCannon.position);
+    if(cannon.position.y < -2 && !gameOver) {
+        gameOver = true;
+    }
 }

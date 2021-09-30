@@ -1,21 +1,25 @@
 var renderer, scene, camera, cameraControls, aspectRatio, uiCamera;
 var shooterCamera;
 var mouse = new THREE.Vector2();
-var pullDirection = 0;
 
 const MODELS_SCALE = 50.0;
 
 var elapsedTime = 0;
 
-const NUMBER_OF_MODELS_TO_LOAD = 26;
+const NUMBER_OF_MODELS_TO_LOAD = 3 + ALIENS_POOL_SIZE + BULLETS_POOL_SIZE;
 var modelsLoaded = 0;
 
 var splash = true;
 
-var background, progressBar;
+var background, progressBar, loadingPage, text;
 
 var keyboard;
 var stats;
+
+var pullDirection = 0;
+
+var score = 0;
+var gameOver = false;
 
 function init() {
     renderer = new THREE.WebGLRenderer();
@@ -52,10 +56,6 @@ function init() {
             pullDirection = 1;
         } else if(keyboard.eventMatches(event, 'x')) {
             pullDirection = -1;
-        }
-        
-        if(keyboard.eventMatches(event, 'space')) {
-            spawnAlien();
         }
     })
     
@@ -118,7 +118,7 @@ function loadScene() {
     scene.add(directionalLight);
     scene.add(directionalLight.target);
     const geometry = new THREE.PlaneGeometry(1000, 1000, 50);
-    const material = new THREE.MeshBasicMaterial({color: 0xAFAFAF})
+    const material = new THREE.MeshBasicMaterial({color: 0x09AAF3})
     var floor = new THREE.Mesh(geometry, material);
     floor.rotation.x = - Math.PI / 2;
     floor.receiveShadow = true;
@@ -127,7 +127,6 @@ function loadScene() {
     loadBullets();
     loadAlien();
     loadDessert();
-    scene.add(new THREE.AxesHelper(1));
 }
 
 function loadMenu() {
@@ -161,7 +160,7 @@ function showLoading() {
     background.add(progressBarRoot);
     progressBarRoot.add(progressBar);
     
-    var loadingPage = new THREE.Object3D();
+    loadingPage = new THREE.Object3D();
     loadingPage.position.set(2000, 2000, 2001);
     loadingPage.rotation.y = Math.PI;
     loadingPage.add(background);
@@ -178,7 +177,7 @@ function showLoading() {
         })
         geometry.computeBoundingBox();
         geometry.center();
-        var text = new THREE.Mesh(geometry, material2);
+        text = new THREE.Mesh(geometry, material2);
         text.position.set(0, 0.15, 0.1);
         loadingPage.add(text);
     });
@@ -193,22 +192,43 @@ function update() {
     elapsedTime = (ahora - antes) / 1000;
     antes = ahora;
     
-    if(!splash) {
+    if(!splash && !gameOver) {
         updateCat();
-        updateAlien();
-        updateCannonRotation();
         updateCannonPosition();
+        updateCannonRotation();
         updateBullets();
         TWEEN.update(ahora);
         updatePhysics();
-    } else {
+    } else if(!gameOver) {
         updateProgressBar();
         if(modelsLoaded >= NUMBER_OF_MODELS_TO_LOAD) {
             splash = false;
             background.clear();
+            loadingPage.remove(text);
+            
+            var material2 = new THREE.MeshBasicMaterial({color: 0x983e65, side: THREE.DoubleSide});
+            var loader = new THREE.FontLoader();
+            loader.load('fonts/helvetiker_regular.typeface.json', function(font) {
+                var geometry = new THREE.TextGeometry('Game over', {
+                    font: font,
+                    size: 0.1,
+                    height: 0.1,
+                    curveSegments: 12,
+                    bevelEnabled: false
+                })
+                geometry.computeBoundingBox();
+                geometry.center();
+                text = new THREE.Mesh(geometry, material2);
+                text.position.set(0, 0.15, 0.1);
+                loadingPage.add(text);
+            });
+            
+            spawnAlien();
         } else {
             console.log("Models loaded: " + modelsLoaded.toString());
         }
+    } else {
+            
     }
     //cameraControls.update();
 }
@@ -225,7 +245,7 @@ function render() {
     
     update();
     
-    if(!splash) {
+    if(!splash && !gameOver) {
         renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
         renderer.setScissorTest(true);

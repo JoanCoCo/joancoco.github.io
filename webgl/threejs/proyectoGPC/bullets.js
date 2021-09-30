@@ -1,6 +1,6 @@
 var bullets = [];
 var timers = [];
-const BULLETS_POOL_SIZE = 20;
+const BULLETS_POOL_SIZE = 8;
 var nextToShoot = 0;
 const LOCAL_SPAWN_POINT = new THREE.Vector3(0, 120, -80);
 const LIFE_TIME = 3.0;
@@ -32,7 +32,7 @@ function loadBullets() {
                     for(var i = 0; i < BULLETS_POOL_SIZE; i++) {
                         var shape = new CANNON.Box(new CANNON.Vec3(8.284 * (s / 4), 13.819 * (s / 4), 7.788 * (s / 4)));
                         var mass = 1;
-                        var phyBody = new CANNON.Body({mass, shape});
+                        var phyBody = new CANNON.Body({mass: mass, shape: shape});
                         
                         phyBullets.push(phyBody);
                         
@@ -68,7 +68,7 @@ function updateBullets() {
         if(timers[i] < 0) {
             scene.remove(bullets[i]);
             phyWorld.remove(phyBullets[i]);
-            //resetPhsyicBody(phyBullets[i]);
+            resetPhsyicBody(phyBullets[i]);
         } else {
             timers[i] = timers[i] - elapsedTime;
         }

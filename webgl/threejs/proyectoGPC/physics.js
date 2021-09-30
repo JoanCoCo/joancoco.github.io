@@ -4,12 +4,15 @@ function initPhysics() {
     phyWorld = new CANNON.World();
     phyWorld.gravity.set(0, -10, 0);
     phyWorld.broadphase = new CANNON.NaiveBroadphase();
+    // phyWorld.broadphase = new CANNON.GridBroadphase(new CANNON.Vec3(-12, -2, -20), new CANNON.Vec3(12, 20, 20), 15, 15, 15);
     phyWorld.solver.iterations = 10;
 }
 
 function updatePhysics() {
     phyWorld.step(elapsedTime);
     updateBulletsPhysics();
+    updateAlienPhysics();
+    updateCannonPhysics();
 }
 
 function resetPhsyicBody(body) {
