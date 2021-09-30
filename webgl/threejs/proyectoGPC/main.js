@@ -196,6 +196,7 @@ function update() {
         updateCat();
         updateCannonPosition();
         updateCannonRotation();
+        updateAlienRotation();
         updateBullets();
         TWEEN.update(ahora);
         updatePhysics();
