@@ -4,6 +4,7 @@ const CANNON_SPEED = 1.0;
 var phyCannon;
 
 const CANNON_BOUNDING_BOX = {x: 42.349, y: 4.717, z: 34.640};
+const SPHERE_EXTRA_SIZE = 30;
 
 function loadCannon() {
     var loader = new THREE.ObjectLoader();
@@ -49,11 +50,12 @@ function loadCannon() {
                     camera.rotation.y = Math.PI;
                     
                     //var shape = new CANNON.Box(new CANNON.Vec3(CANNON_BOUNDING_BOX.x * s / 2, CANNON_BOUNDING_BOX.y * s / 2, CANNON_BOUNDING_BOX.z * s / 2));
-                    var shape = new CANNON.Sphere(CANNON_BOUNDING_BOX.y * s / 2);
+                    var shape = new CANNON.Sphere((CANNON_BOUNDING_BOX.y + SPHERE_EXTRA_SIZE) * s / 2);
                     var mass = 3;
                     phyCannon = new CANNON.Body({mass: mass, shape: shape, linearDamping: 0.9, angularDamping: 0.9});
         
                     phyCannon.position.copy(cannon.position);
+                    phyCannon.position.y = phyCannon.position.y + SPHERE_EXTRA_SIZE * s / 2;
                     phyCannon.quaternion.copy(cannon.quaternion);
         
                     phyWorld.add(phyCannon);
@@ -83,6 +85,8 @@ function updateCannonPosition() {
 
 function updateCannonPhysics() {
     cannon.position.copy(phyCannon.position);
+    var s = 1 / MODELS_SCALE;
+    cannon.position.y = cannon.position.y - SPHERE_EXTRA_SIZE * s / 2;
     if(cannon.position.y < -2 && !gameOver) {
         gameOver = true;
         document.getElementById('container').removeChild(scoreDisplay.domElement);

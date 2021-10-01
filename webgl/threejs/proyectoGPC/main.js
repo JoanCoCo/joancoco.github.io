@@ -21,6 +21,12 @@ var pullDirection = 0;
 var scoreDisplay;
 var gameOver = false;
 
+const THIRD_PERSON_VIEW = 2;
+const FIRS_PERSON_VIEW = 1;
+const COMBINED_VIEW = 0;
+
+var viewMode = COMBINED_VIEW;
+
 function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -57,6 +63,11 @@ function init() {
         } else if(keyboard.eventMatches(event, 'x')) {
             pullDirection = -1;
         }
+        
+        if(keyboard.eventMatches(event, 'a')) {
+            viewMode = (viewMode + 1) % 3;
+            updateAspectRatio();
+        }
     })
     
     keyboard.domElement.addEventListener('keyup', function(event) {
@@ -84,6 +95,14 @@ function updateAspectRatio() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = aspectRatio;
     camera.updateProjectionMatrix();
+    
+    if(viewMode == FIRS_PERSON_VIEW) {
+        shooterCamera.aspect = aspectRatio;
+        shooterCamera.updateProjectionMatrix();
+    } else {
+        shooterCamera.aspect = 1;
+        shooterCamera.updateProjectionMatrix();
+    }
     
     var width = 2;
     var height = 2 / aspectRatio;
@@ -252,16 +271,28 @@ function render() {
     update();
     
     if(!splash && !gameOver) {
-        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-        renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
-        renderer.setScissorTest(true);
-        renderer.render(scene, camera);
+        if(viewMode == COMBINED_VIEW) {
+            renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+            renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
+            renderer.setScissorTest(true);
+            renderer.render(scene, camera);
         
-        var size = (window.innerHeight > window.innerWidth) ? window.innerWidth / 4 : window.innerHeight / 4;
-        renderer.setViewport(0, window.innerHeight - size, size, size);
-        renderer.setScissor(0, window.innerHeight - size, size, size);
-        renderer.setScissorTest(true);
-        renderer.render(scene, shooterCamera);
+            var size = (window.innerHeight > window.innerWidth) ? window.innerWidth / 4 : window.innerHeight / 4;
+            renderer.setViewport(0, window.innerHeight - size, size, size);
+            renderer.setScissor(0, window.innerHeight - size, size, size);
+            renderer.setScissorTest(true);
+            renderer.render(scene, shooterCamera);
+        } else if(viewMode == THIRD_PERSON_VIEW) {
+            renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+            renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
+            renderer.setScissorTest(true);
+            renderer.render(scene, camera);
+        } else {
+            renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+            renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
+            renderer.setScissorTest(true);
+            renderer.render(scene, shooterCamera);
+        }
     } else {
         renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
