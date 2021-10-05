@@ -8,6 +8,9 @@ const SPHERE_EXTRA_SIZE = 30;
 
 var cannonHasBeenLoaded = false
 
+const CANNON_WARM_UP_TIME = 0.5
+var cannonWarmUp = 0
+
 function loadCannon() {
     var loader = new THREE.ObjectLoader();
     loader.load('models/canon.json',
@@ -91,12 +94,17 @@ function updateCannonPosition() {
 }
 
 function updateCannonPhysics() {
-    cannon.position.copy(phyCannon.position);
-    var s = 1 / MODELS_SCALE;
-    cannon.position.y = cannon.position.y - SPHERE_EXTRA_SIZE * s / 2;
-    if(cannon.position.y < -2 && !gameOver) {
-        gameOver = true;
-        document.getElementById('container').removeChild(scoreDisplay.domElement);
+    if(cannonWarmUp >= CANNON_WARM_UP_TIME) {
+        cannon.position.copy(phyCannon.position);
+        var s = 1 / MODELS_SCALE;
+        cannon.position.y = cannon.position.y - SPHERE_EXTRA_SIZE * s / 2;
+        if(cannon.position.y < -2 && !gameOver) {
+            gameOver = true;
+            document.getElementById('container').removeChild(scoreDisplay.domElement);
+        }
+    } else {
+        keepCannonPhysicsStill();
+        cannonWarmUp += elapsedTime;
     }
 }
 
