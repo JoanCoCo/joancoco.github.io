@@ -42,7 +42,7 @@ function loadCannon() {
                         }
                     });
                     obj.name = 'cannon';
-                    obj.position.set(0, 1, 0);
+                    obj.position.set(0, 0.5, 0);
                     var s = 1 / MODELS_SCALE;
                     obj.scale.set(s, s, s);
                     obj.receiveShadow = true;
