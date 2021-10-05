@@ -22,23 +22,28 @@ var scoreDisplay;
 var gameOver = false;
 
 const THIRD_PERSON_VIEW = 2;
-const FIRS_PERSON_VIEW = 1;
+const FIRST_PERSON_VIEW = 1;
 const COMBINED_VIEW = 0;
 
-var viewMode = COMBINED_VIEW;
+var viewMode = THIRD_PERSON_VIEW;
+
+var skyBox;
 
 function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(new THREE.Color(0xFFFFFF), 1.0);
     document.getElementById('container').appendChild(renderer.domElement);
+    
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     scene = new THREE.Scene();
 
     aspectRatio = window.innerWidth / window.innerHeight;
-    camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1100);
     
-    shooterCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    shooterCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1100);
     
     var width = 2;
     var height = 2 / aspectRatio;
@@ -51,7 +56,7 @@ function init() {
     //cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
     //cameraControls.target.set( 0, 0, 0 );
     
-    scene.fog = new THREE.Fog(0xEFD1D5, 100, 1000);
+    //scene.fog = new THREE.Fog(0xEFD1D5, 100, 1000);
     
     keyboard = new THREEx.KeyboardState(renderer.domElement);
     renderer.domElement.setAttribute("tabIndex", "0");
@@ -96,7 +101,7 @@ function updateAspectRatio() {
     camera.aspect = aspectRatio;
     camera.updateProjectionMatrix();
     
-    if(viewMode == FIRS_PERSON_VIEW) {
+    if(viewMode == FIRST_PERSON_VIEW) {
         shooterCamera.aspect = aspectRatio;
         shooterCamera.updateProjectionMatrix();
     } else {
@@ -128,20 +133,55 @@ function onClick() {
 
 function loadScene() {
     const light = new THREE.AmbientLight(0xAFAFAF);
-    var directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-    directionalLight.castShadow = true;
-    directionalLight.rotation.x = -Math.PI / 3;
-    directionalLight.rotation.y = Math.PI / 3;
-    directionalLight.target.position.set(-10, -10, -20);
     scene.add(light);
-    scene.add(directionalLight);
-    scene.add(directionalLight.target);
-    const geometry = new THREE.PlaneGeometry(1000, 1000, 50);
-    const material = new THREE.MeshBasicMaterial({color: 0x09AAF3})
-    var floor = new THREE.Mesh(geometry, material);
-    floor.rotation.x = - Math.PI / 2;
-    floor.receiveShadow = true;
-    scene.add(floor);
+    
+    var d = 20;
+    
+    var directionalLight1 = new THREE.DirectionalLight(0xFFFFFF, 0.55);
+    directionalLight1.target.position.set(-10, -10, -20);
+    scene.add(directionalLight1);
+    
+    var directionalLight2 = new THREE.DirectionalLight(0xFFAAFF, 0.4);
+    directionalLight2.castShadow = true;
+    
+    //directionalLight2.shadow.radius = 2;
+    directionalLight2.shadow.camera.left = -d;
+    directionalLight2.shadow.camera.right = d;
+    directionalLight2.shadow.camera.top = d;
+    directionalLight2.shadow.camera.bottom = -d;
+    directionalLight2.shadow.mapSize.width = 2048;
+    directionalLight2.shadow.mapSize.height = 2048;
+    directionalLight2.shadow.camera.far = 500;
+    directionalLight2.shadow.camera.near = 1
+    
+    directionalLight2.position.set(150, 100, 150);
+    directionalLight2.target.position.set(0, 0, 0);
+    scene.add(directionalLight2);
+    
+    var sun = new THREE.Mesh(new THREE.SphereGeometry(2, 20, 20), new THREE.MeshBasicMaterial({color: 0xFFD100}));
+    sun.position.set(10, 10, 10);
+    scene.add(sun);
+    
+    var textureLoader = new THREE.TextureLoader();
+    textureLoader.load("images/sea_texture.png", function(texture) {
+        texture.repeat.set(80, 100);
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.magFilter = THREE.LinearFilter;
+        texture.minFilter = THREE.LinearMipMapLinearFilter;
+        const material = new THREE.MeshPhongMaterial( {map: texture, shininess: 0.1} )
+        const geometry = new THREE.PlaneGeometry(1000, 1000, 1);
+        var floor = new THREE.Mesh(geometry, material);
+        floor.rotation.x = - Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+    });
+    
+    var skyBoxLoader = new THREE.CubeTextureLoader();
+    skyBoxLoader.setPath("images/sky/");
+    skyBox = skyBoxLoader.load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
+    
+    scene.background = skyBox;
+    
     loadCat();
     loadBullets();
     loadAlien();
@@ -219,7 +259,6 @@ function update() {
         updateBullets();
         TWEEN.update(ahora);
         updatePhysics();
-        //ThreeMeshUI.update();
     } else if(!gameOver) {
         updateProgressBar();
         if(modelsLoaded >= NUMBER_OF_MODELS_TO_LOAD) {

@@ -1,10 +1,12 @@
 var cannon, shooter, leftWeel, rightWeel, seat;
-const CANNON_SPEED = 1.0;
+const CANNON_SPEED = 2.0;
 
 var phyCannon;
 
 const CANNON_BOUNDING_BOX = {x: 42.349, y: 4.717, z: 34.640};
 const SPHERE_EXTRA_SIZE = 30;
+
+var cannonHasBeenLoaded = false
 
 function loadCannon() {
     var loader = new THREE.ObjectLoader();
@@ -37,7 +39,7 @@ function loadCannon() {
                         }
                     });
                     obj.name = 'cannon';
-                    obj.position.set(0, 1, 0);
+                    obj.position.set(0, 4, 0);
                     var s = 1 / MODELS_SCALE;
                     obj.scale.set(s, s, s);
                     obj.receiveShadow = true;
@@ -59,6 +61,8 @@ function loadCannon() {
                     phyCannon.quaternion.copy(cannon.quaternion);
         
                     phyWorld.add(phyCannon);
+        
+                    cannonHasBeenLoaded = true;
                     
                     modelsLoaded += 1;
                 });
@@ -80,6 +84,9 @@ function updateCannonPosition() {
         var z = Math.cos(cannon.rotation.y) * mag;
         var x = Math.sin(cannon.rotation.y) * mag;
         phyCannon.applyImpulse(new CANNON.Vec3(x, 0, z), phyCannon.position);
+        
+        //leftWeel.rotation.x = leftWeel.rotation.x + (Math.PI / 10) * elapsedTime;
+        //rightWeel.rotation.x = rightWeel.rotation.x + (Math.PI / 10) * elapsedTime;
     }
 }
 
@@ -90,5 +97,15 @@ function updateCannonPhysics() {
     if(cannon.position.y < -2 && !gameOver) {
         gameOver = true;
         document.getElementById('container').removeChild(scoreDisplay.domElement);
+    }
+}
+
+function keepCannonPhysicsStill() {
+    if(cannonHasBeenLoaded) {
+        var s = 1 / MODELS_SCALE;
+        resetPhsyicBody(phyCannon);
+        phyCannon.position.copy(cannon.position);
+        phyCannon.position.y = phyCannon.position.y + SPHERE_EXTRA_SIZE * s / 2;
+        phyCannon.quaternion.copy(cannon.quaternion);
     }
 }
