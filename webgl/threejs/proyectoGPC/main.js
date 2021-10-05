@@ -65,13 +65,23 @@ function init() {
     keyboard.domElement.addEventListener('keydown', function(event) {
         if(keyboard.eventMatches(event, 'z')) {
             pullDirection = 1;
+            if(!cannonWasMoved) {
+                cannonWasMoved = true;
+            }
         } else if(keyboard.eventMatches(event, 'x')) {
             pullDirection = -1;
+            if(!cannonWasMoved) {
+                cannonWasMoved = true;
+            }
         }
         
         if(keyboard.eventMatches(event, 'a')) {
             viewMode = (viewMode + 1) % 3;
             updateAspectRatio();
+        }
+        
+        if(keyboard.eventMatches(event, 's')) {
+            renderer.shadowMap.enabled = ! renderer.shadowMap.enabled;
         }
     })
     
