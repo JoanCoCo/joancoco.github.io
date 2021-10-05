@@ -8,7 +8,7 @@ const SPHERE_EXTRA_SIZE = 30;
 
 var cannonHasBeenLoaded = false
 
-const CANNON_WARM_UP_TIME = 0.5
+const CANNON_WARM_UP_TIME = 10.5
 var cannonWarmUp = 0
 
 function loadCannon() {
@@ -42,7 +42,7 @@ function loadCannon() {
                         }
                     });
                     obj.name = 'cannon';
-                    obj.position.set(0, 4, 0);
+                    obj.position.set(0, 10, 0);
                     var s = 1 / MODELS_SCALE;
                     obj.scale.set(s, s, s);
                     obj.receiveShadow = true;
