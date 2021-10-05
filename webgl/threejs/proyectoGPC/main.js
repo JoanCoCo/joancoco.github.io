@@ -41,9 +41,9 @@ function init() {
     scene = new THREE.Scene();
 
     aspectRatio = window.innerWidth / window.innerHeight;
-    camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1100);
+    camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1500);
     
-    shooterCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1100);
+    shooterCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1500);
     
     var width = 2;
     var height = 2 / aspectRatio;
