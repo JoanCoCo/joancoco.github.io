@@ -6,10 +6,12 @@ var phyCannon;
 const CANNON_BOUNDING_BOX = {x: 42.349, y: 4.717, z: 34.640};
 const SPHERE_EXTRA_SIZE = 30;
 
-var cannonHasBeenLoaded = false
+var cannonHasBeenLoaded = false;
 
-const CANNON_WARM_UP_TIME = 5.5
-var cannonWarmUp = 0
+const CANNON_WARM_UP_TIME = 0.6;
+var cannonWarmUp = 0;
+
+var cannonWasMoved = false;
 
 function loadCannon() {
     var loader = new THREE.ObjectLoader();
@@ -42,7 +44,7 @@ function loadCannon() {
                         }
                     });
                     obj.name = 'cannon';
-                    obj.position.set(0, 0.5, 0);
+                    obj.position.set(0, 0.55, 0);
                     var s = 1 / MODELS_SCALE;
                     obj.scale.set(s, s, s);
                     obj.receiveShadow = true;
@@ -94,7 +96,7 @@ function updateCannonPosition() {
 }
 
 function updateCannonPhysics() {
-    if(cannonWarmUp >= CANNON_WARM_UP_TIME) {
+    if(cannonWarmUp >= CANNON_WARM_UP_TIME && cannonWasMoved) {
         cannon.position.copy(phyCannon.position);
         var s = 1 / MODELS_SCALE;
         cannon.position.y = cannon.position.y - SPHERE_EXTRA_SIZE * s / 2;
