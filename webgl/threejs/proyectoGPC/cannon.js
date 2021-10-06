@@ -1,4 +1,4 @@
-var cannon, shooter, leftWeel, rightWeel, seat;
+var cannon, shooter, leftWheel, rightWheel, seat;
 const CANNON_SPEED = 2.0;
 
 var phyCannon;
@@ -15,7 +15,7 @@ var cannonWasMoved = false;
 
 function loadCannon() {
     var loader = new THREE.ObjectLoader();
-    loader.load('models/canon.json',
+    loader.load('models/cannon.json',
                 function(obj) {
                     obj.traverse(function(child) {
                         switch(child.name) {
@@ -26,10 +26,10 @@ function loadCannon() {
                                 shooterCamera.rotation.y = Math.PI;
                                 break;
                             case 'left_wheel':
-                                leftWeel = child;
+                                leftWheel = child;
                                 break;
                             case 'right_wheel':
-                                rightWeel = child;
+                                rightWheel = child;
                                 break;
                             case 'seat':
                                 seat = child;
@@ -80,6 +80,9 @@ function updateCannonRotation() {
         var yr = cannon.rotation.y - mouse.x * Math.PI / 2 * elapsedTime;
         cannon.rotation.y = yr;
         //phyCannon.quaternion.copy(cannon.quaternion);
+        
+        leftWheel.rotation.x = leftWheel.rotation.x - mouse.x * Math.PI / 2 * elapsedTime;
+        rightWheel.rotation.x = rightWheel.rotation.x + mouse.x * Math.PI / 2 * elapsedTime;
     }
 }
 
@@ -90,8 +93,8 @@ function updateCannonPosition() {
         var x = Math.sin(cannon.rotation.y) * mag;
         phyCannon.applyImpulse(new CANNON.Vec3(x, 0, z), phyCannon.position);
         
-        //leftWeel.rotation.x = leftWeel.rotation.x + (Math.PI / 10) * elapsedTime;
-        //rightWeel.rotation.x = rightWeel.rotation.x + (Math.PI / 10) * elapsedTime;
+        leftWheel.rotation.x = leftWheel.rotation.x + pullDirection * (Math.PI / 5) * elapsedTime;
+        rightWheel.rotation.x = rightWheel.rotation.x + pullDirection * (Math.PI / 5) * elapsedTime;
     }
 }
 

@@ -8,7 +8,7 @@ var alienTails = [];
 
 var aliensBussy = [];
 
-const ALIENS_POOL_SIZE = 3;
+const ALIENS_POOL_SIZE = 1;
 
 var alienRightWingsDownRotation = [];
 var alienRightWingsUpRotation = [];
@@ -83,7 +83,7 @@ function loadAlien() {
                         
                         var shape = new CANNON.Box(new CANNON.Vec3(ALIEN_BOUNDING_BOX_SIZE.x * s / 2, ALIEN_BOUNDING_BOX_SIZE.y * s / 2, ALIEN_BOUNDING_BOX_SIZE.z * s / 2));
                         
-                        console.log(shape);
+                        //console.log(shape);
                         
                         var mass = 1;
                         var phyBody = new CANNON.Body({mass: mass, type: CANNON.Body.KINEMATIC, shape: shape});
@@ -102,18 +102,12 @@ function loadAlien() {
 function updateAlienRotation() {
     for(var i = 0; i < ALIENS_POOL_SIZE; i++) {
         if(aliensBussy[i] >= 0) {
-            /*var dir = new THREE.Vector3(cannon.position.x - aliens[i].position.x, cannon.position.y - aliens[i].position.y, cannon.position.z - aliens[i].position.z);
-            dir.normalize();
-            var angle = Math.acos(dir.z);
-            console.log(angle * 180 / Math.PI)
-            aliens[i].rotation.z = angle + Math.PI;*/
             var y = aliens[i].rotation.y;
             var x =  aliens[i].rotation.x;
             aliens[i].lookAt(cannon.position);
             aliens[i].rotation.x = x;
             aliens[i].rotation.y = y;
             aliens[i].rotation.z = -1 * aliens[i].rotation.z + Math.PI;
-            //aliens[i].rotation.z = aliens[i].rotation.z + Math.PI;
             phyAliens[i].quaternion.copy(aliens[i].quaternion);
         }
     }

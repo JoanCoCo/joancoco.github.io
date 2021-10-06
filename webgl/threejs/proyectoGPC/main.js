@@ -29,6 +29,10 @@ var viewMode = THIRD_PERSON_VIEW;
 
 var skyBox;
 
+var aKeyIsPressed = false;
+
+var directionalLight2;
+
 function init() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -76,12 +80,19 @@ function init() {
         }
         
         if(keyboard.eventMatches(event, 'a')) {
-            viewMode = (viewMode + 1) % 3;
-            updateAspectRatio();
+            if(!aKeyIsPressed) {
+                viewMode = (viewMode + 1) % 3;
+                updateAspectRatio();
+                aKeyIsPressed = true;
+            }
         }
         
         if(keyboard.eventMatches(event, 's')) {
-            renderer.shadowMap.enabled = ! renderer.shadowMap.enabled;
+            if(!aKeyIsPressed) {
+                renderer.shadowMap.enabled = ! renderer.shadowMap.enabled;
+                directionalLight2.castShadow = ! directionalLight2.castShadow;
+                aKeyIsPressed = true;
+            }
         }
     })
     
@@ -90,6 +101,10 @@ function init() {
             pullDirection = 0;
         } else if(keyboard.eventMatches(event, 'x')) {
             pullDirection = 0;
+        }
+        
+        if((keyboard.eventMatches(event, 's') || keyboard.eventMatches(event, 'a')) && aKeyIsPressed) {
+            aKeyIsPressed = false;
         }
     })
     
@@ -151,7 +166,7 @@ function loadScene() {
     directionalLight1.target.position.set(-10, -10, -20);
     scene.add(directionalLight1);
     
-    var directionalLight2 = new THREE.DirectionalLight(0xFFAAFF, 0.4);
+    directionalLight2 = new THREE.DirectionalLight(0xFFAAFF, 0.4);
     directionalLight2.castShadow = true;
     
     //directionalLight2.shadow.radius = 2;
@@ -255,21 +270,22 @@ function showLoading() {
 }
 
 var antes = Date.now();
+var delta = 0;
 
 function update() {
     var ahora = Date.now();
     elapsedTime = (ahora - antes) / 1000;
     antes = ahora;
     
-    if(!splash && !gameOver) {
+    if(!splash && !gameOver && elapsedTime < 1.0 && !aKeyIsPressed) {
         updateCat();
         updateCannonPosition();
         updateCannonRotation();
         updateAlienRotation();
         updateBullets();
-        TWEEN.update(ahora);
+        TWEEN.update(ahora - delta);
         updatePhysics();
-    } else if(!gameOver) {
+    } else if(!gameOver && splash) {
         updateProgressBar();
         if(modelsLoaded >= NUMBER_OF_MODELS_TO_LOAD) {
             splash = false;
@@ -302,9 +318,9 @@ function update() {
             console.log("Models loaded: " + modelsLoaded.toString());
         }
     } else {
-            
+        delta += elapsedTime * 1000;
+        //console.log(delta);
     }
-    //cameraControls.update();
 }
 
 function updateProgressBar() {
