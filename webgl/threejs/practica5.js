@@ -315,8 +315,8 @@ function loadScene() {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         texture.magFilter = THREE.LinearFilter;
         texture.minFilter = THREE.LinearMipMapLinearFilter;
-        var geometry = new THREE.PlaneGeometry(1000, 1000, 1000, 1000);
-        var material = new THREE.MeshLambertMaterial({map: texture});
+        var geometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+        var material = new THREE.MeshPhongMaterial({map: texture, shininess: 0});
         plane = new THREE.Mesh(geometry, material);
         plane.position.x = 0
         plane.position.y = 0
