@@ -102,26 +102,26 @@ function loadPinza() {
     ];
 
     var indices = [
-        0, 1, 3,
-        1, 2, 3,
-        0, 3, 7,
-        0, 7, 4,
-        4, 7, 5,
-        5, 7, 6,
-        0, 4, 1,
-        4, 5, 1,
-        3, 2, 7,
-        2, 6, 7,
-        1, 8, 2,
-        8, 9, 2,
-        5, 6, 10,
-        6, 11, 10,
-        1, 5, 8,
-        5, 10, 8,
-        8, 10, 9,
-        10, 11, 9,
-        2, 9, 6,
-        6, 9, 11
+        3, 1, 0,
+        3, 2, 1,
+        7, 3, 0,
+        4, 7, 0,
+        5, 7, 4,
+        6, 7, 5,
+        1, 4, 0,
+        1, 5, 4,
+        7, 2, 3,
+        7, 6, 2,
+        2, 8, 1,
+        2, 9, 8,
+        10, 6, 5,
+        10, 11, 6,
+        8, 5, 1,
+        8, 10, 5,
+        9, 10, 8,
+        9, 11, 10,
+        6, 9, 2,
+        11, 9, 6
     ];
     var malla = new THREE.Geometry();
 
@@ -134,6 +134,8 @@ function loadPinza() {
         var triangulo = new THREE.Face3(indices[i], indices[i+1], indices[i+2]);
         malla.faces.push(triangulo);
     }
+    
+    malla.computeFaceNormals();
 
     var material = new THREE.MeshBasicMaterial({color: 0x00FFFF, wireframe: true});
     var dedoDerecho = new THREE.Mesh(malla, material);

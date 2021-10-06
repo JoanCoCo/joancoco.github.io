@@ -163,7 +163,6 @@ function loadScene() {
     var d = 20;
     
     var directionalLight1 = new THREE.DirectionalLight(0xFFFFFF, 0.55);
-    directionalLight1.target.position.set(-10, -10, -20);
     scene.add(directionalLight1);
     
     directionalLight2 = new THREE.DirectionalLight(0xFFAAFF, 0.4);
@@ -182,6 +181,7 @@ function loadScene() {
     directionalLight2.position.set(150, 100, 150);
     directionalLight2.target.position.set(0, 0, 0);
     scene.add(directionalLight2);
+    scene.add(directionalLight2.target);
     
     var sun = new THREE.Mesh(new THREE.SphereGeometry(2, 20, 20), new THREE.MeshBasicMaterial({color: 0xFFD100}));
     sun.position.set(10, 10, 10);
