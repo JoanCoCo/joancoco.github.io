@@ -30,7 +30,7 @@ function loadBullets() {
                     //var boxSize = box.max - box.min;
                     
                     for(var i = 0; i < BULLETS_POOL_SIZE; i++) {
-                        var shape = new CANNON.Box(new CANNON.Vec3(8.0 * (s / 4), 8.0 * (s / 4), 13.443 * (s / 4)));
+                        var shape = new CANNON.Box(new CANNON.Vec3(8.0 * (s / 4) / 2, 8.0 * (s / 4) / 2, 13.443 * (s / 4) / 2));
                         var mass = 1;
                         var phyBody = new CANNON.Body({mass: mass, shape: shape});
                         
@@ -48,6 +48,12 @@ function shootBullet() {
     var spawnRotation = new THREE.Quaternion();
     shooterCamera.getWorldPosition(spawnPosition);
     shooterCamera.getWorldQuaternion(spawnRotation);
+    
+    if(timers[nextToShoot] >= 0) {
+        scene.remove(bullets[nextToShoot]);
+        phyWorld.remove(phyBullets[nextToShoot]);
+        resetPhsyicBody(phyBullets[nextToShoot]);
+    }
     
     bullets[nextToShoot].position.set(spawnPosition.x, spawnPosition.y, spawnPosition.z);
     bullets[nextToShoot].quaternion.copy(spawnRotation);
