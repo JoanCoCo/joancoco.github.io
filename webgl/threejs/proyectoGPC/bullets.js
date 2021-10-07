@@ -30,7 +30,7 @@ function loadBullets() {
                     //var boxSize = box.max - box.min;
                     
                     for(var i = 0; i < BULLETS_POOL_SIZE; i++) {
-                        var shape = new CANNON.Box(new CANNON.Vec3(8.284 * (s / 4), 13.819 * (s / 4), 7.788 * (s / 4)));
+                        var shape = new CANNON.Box(new CANNON.Vec3(8.0 * (s / 4), 8.0 * (s / 4), 13.443 * (s / 4)));
                         var mass = 1;
                         var phyBody = new CANNON.Body({mass: mass, shape: shape});
                         
