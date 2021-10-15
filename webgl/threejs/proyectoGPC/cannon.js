@@ -88,7 +88,7 @@ function updateCannonRotation() {
 
 function updateCannonPosition() {
     if(pullDirection != 0) {
-        var mag = CANNON_SPEED * pullDirection;
+        var mag = CANNON_SPEED * pullDirection * elapsedTime * 40;
         var z = Math.cos(cannon.rotation.y) * mag;
         var x = Math.sin(cannon.rotation.y) * mag;
         phyCannon.applyImpulse(new CANNON.Vec3(x, 0, z), phyCannon.position);
